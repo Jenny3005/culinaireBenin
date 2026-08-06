@@ -1,0 +1,33 @@
+import 'package:culinairebenin/pages/loading.dart';
+import 'package:flutter/material.dart';
+import 'package:culinairebenin/pages/home_page.dart';
+import 'package:culinairebenin/pages/login.dart';
+import 'package:culinairebenin/pages/register.dart';
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Trésors Culinaires du Bénin',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(235, 65, 18, 1)),
+      ),
+      home: const MyLoadingPage(title: 'Loading...'),
+
+      initialRoute: '/',
+      routes: {
+        '/home': (context) => const MyHomePage(title: 'Trésors Culinaires du Bénin'),
+        '/register': (context) => const RegisterPage(),
+        '/login': (context) => const LoginPage(),
+      },
+    );
+  }
+}
+
