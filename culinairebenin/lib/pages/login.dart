@@ -25,39 +25,43 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset('assets/images/logo.png', width: 100, height: 100),
+                const SizedBox(height: 5),
                 Text('Trésors Culinaires du Bénin')
               ],
             ),)
           ),
           Positioned(
-            top: 190,
+            top: 200,
             right: 20,
             left: 20,
-            bottom: 20,
+            
             child: Container(
+              height: 300,
               color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                
                 children: [
+                  const SizedBox(height: 10,),
                   Text("Bienvenue !",
-                  textAlign: TextAlign.left,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                   ),),
                   const SizedBox(height: 10,),
                   Text("Connectez vous pour découvrir les saveurs du Bénin",
-                  textAlign: TextAlign.left,
                   ),
                   const SizedBox(height: 15,),
-                  Expanded(child: TextField(decoration: InputDecoration(
+                  TextField(decoration: InputDecoration(
                     hintText: "votre@email.com",
                     labelText: "Adresse email",
                     prefixIcon: Icon(Icons.email_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12)
                     )
-                  ),),),
-                  const SizedBox(height: 12,),
-                  Expanded(child: TextField(
+                  ),),
+                  const SizedBox(height: 15,),
+                  TextField(
                     decoration: InputDecoration(
                       labelText: "Mot de passe",
                       hintText: "*****",
@@ -66,10 +70,11 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(12),
                       )
                     ),
-                  )),
+                  ),
                   const SizedBox(height: 15,),
+                  
                   Row(children: [
-                    ElevatedButton(onPressed: () {},
+                    Expanded(child:ElevatedButton(onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.brown,
                       foregroundColor: Colors.white,
@@ -78,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12)
                     ),
-                    child: Text("Se connecter") )
+                    child: Text("Se connecter") ))
                   ],)
                 ],
               ),
