@@ -1,4 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -9,22 +13,72 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   String? selectedRegion;
+  String? selectedEthnie;
   String selectedLevel = 'Débutant';
 
-  final List<String> regions = [
-    'Atacora',
-    'Alibori',
-    'Borgou',
-    'Collines',
-    'Couffo',
-    'Donga',
-    'Littoral',
-    'Mono',
-    'Ouémé',
-    'Plateau',
-    'Atlantique',
-    'Zou',
-  ];
+  List<String> regions = [];
+  List<String> ethnies = [];
+  bool isLoadingRegions = true;
+  bool isLoadingEthnies=true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRegions();
+    fetchEthnies();
+  }
+
+  Future<void> fetchEthnies() async {
+    final String host = kIsWeb ? 'localhost':'10.0.2.2';
+    final Uri url = Uri.parse('http:$host:8000/api/ethnies');
+
+    try {
+      final response = await http.get(url,headers: {'Accept' :'application/json'});
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+
+        setState(() {
+          ethnies =data.map((item) {
+            return item is Map ? item['nom'].toString() : item.toString();
+          }).toList();
+
+          isLoadingRegions = false;
+        });
+      }
+    } catch (e) {
+      print("Erreur de chargement des ethnies :$e");
+      setState(() {
+        isLoadingEthnies = false;
+      });
+    }
+  }
+
+  Future<void> fetchRegions() async {
+    final String host = kIsWeb ? 'localhost' : '10.0.2.2';
+    final Uri url = Uri.parse('http://$host:8000/api/regions');
+
+    try {
+      final response = await http.get(url, headers: {'Accept': 'application/json'});
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+
+        setState(() {
+          regions = data.map((item) {
+            return item is Map ? item['nom'].toString() : item.toString();
+          }).toList();
+
+          isLoadingRegions = false;
+        });
+      }
+    } catch (e) {
+      print("Erreur de chargement des régions : $e");
+      setState(() {
+        isLoadingRegions = false;
+      });
+    }
+  }
 
   final List<String> levels = ['Débutant', 'Intermédiaire', 'Professionnel'];
 
@@ -137,11 +191,39 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    DropdownButtonFormField<String>(
+                    isLoadingEthnies 
+                      ? const Center(child: CircularProgressIndicator())
+                      : DropdownButtonFormField(
+                        value: selectedEthnie,
+                        decoration: InputDecoration(
+                          labelText: "Votre ethnie",
+                          hintText: "Choisissez votre ethnie",
+                          prefixIcon: const Icon(Icons.language),
+                          border : OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        items: ethnies.map((String ethnie) {
+                          return DropdownMenuItem<String>(
+                            value: ethnie,
+                            child: Text(ethnie),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedEthnie = newValue;
+                          });
+                        },
+                        validator: (value) => value == null ? "Veuillez choisir une ethnie" : null,
+                      ),
+                    const SizedBox(height: 15),
+                    isLoadingRegions
+                      ? const Center(child:CircularProgressIndicator())
+                      : DropdownButtonFormField<String>(
                       value: selectedRegion,
                       decoration: InputDecoration(
                         labelText: "Votre Région",
-                        hintText: "Sélectioner votre région",
+                        hintText: "Sélectionez votre région",
                         prefixIcon: const Icon(Icons.location_on_outlined),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -160,6 +242,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       },
                       validator: (value) => value == null ? 'Veuillez choisir une région' : null,
                     ),
+                    
                     const SizedBox(height: 15),
                     const Align(
                       alignment: Alignment.centerLeft,

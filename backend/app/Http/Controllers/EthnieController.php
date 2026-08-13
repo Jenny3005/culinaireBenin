@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ethnie;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class EthnieController extends Controller
@@ -10,9 +11,10 @@ class EthnieController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index():JsonResponse
     {
-        //
+        $ethnies=Ethnie::select('id','nom')->get();
+        return response()->json($ethnies,200);
     }
 
     /**
