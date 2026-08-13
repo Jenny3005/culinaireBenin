@@ -125,7 +125,7 @@ class _RegisterPageState extends State<RegisterPage> {
           'password_confirmation': passwordConfirmController.text,
           'ethnie': selectedEthnie,
           'region': selectedRegion,
-          'niveau': selectedLevel,
+          'level': selectedLevel,
         }),
       );
 
@@ -218,7 +218,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     Row(
                       children: [
                         Expanded(
-                          child: TextFormField(
+                          child: TextField(
                             controller: nomController,
                             decoration: InputDecoration(
                               labelText: "Nom",
@@ -232,7 +232,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: TextFormField(
+                          child: TextField(
                             controller: prenomController,
                             decoration: InputDecoration(
                               labelText: "Prenom",
@@ -247,7 +247,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ],
                     ),
                     const SizedBox(height: 15),
-                    TextFormField(
+                    TextField(
                       controller: emailController,
                       decoration: InputDecoration(
                         labelText: "Votre Email",
@@ -259,7 +259,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    TextFormField(
+                    TextField(
                       controller: passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
@@ -272,7 +272,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    TextFormField(
+                    TextField(
                       controller: passwordConfirmController,
                       obscureText: true,
                       decoration: InputDecoration(
@@ -287,7 +287,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(height: 15),
                     isLoadingEthnies 
                       ? const Center(child: CircularProgressIndicator())
-                      : DropdownButtonFormField(
+                      : DropdownButtonFormField<String>(
                         value: selectedEthnie,
                         decoration: InputDecoration(
                           labelText: "Votre ethnie",
