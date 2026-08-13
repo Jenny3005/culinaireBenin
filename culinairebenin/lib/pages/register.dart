@@ -168,6 +168,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
     }
   }
+  
   final List<String> levels = ['Débutant', 'Intermédiaire', 'Professionnel'];
 
   @override
@@ -218,6 +219,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       children: [
                         Expanded(
                           child: TextFormField(
+                            controller: nomController,
                             decoration: InputDecoration(
                               labelText: "Nom",
                               hintText: "Votre nom",
@@ -231,6 +233,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: TextFormField(
+                            controller: prenomController,
                             decoration: InputDecoration(
                               labelText: "Prenom",
                               hintText: "Votre prenom",
@@ -245,6 +248,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 15),
                     TextFormField(
+                      controller: emailController,
                       decoration: InputDecoration(
                         labelText: "Votre Email",
                         hintText: "votreadresse@gmail.com",
@@ -256,6 +260,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 15),
                     TextFormField(
+                      controller: passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: "Mot de passe",
@@ -268,6 +273,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 15),
                     TextFormField(
+                      controller: passwordConfirmController,
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: "Confirmer votre mot de passe",
@@ -382,7 +388,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(height: 10),
                     Row(children: [
                       Expanded(child: 
-                        ElevatedButton(onPressed:() {},
+                        ElevatedButton(onPressed: submitForm,
                           style:ElevatedButton.styleFrom(
                             backgroundColor: Colors.brown,
                             foregroundColor: Colors.white,
@@ -398,7 +404,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(height:12),
                     Row(children: [
                       Text("Déjà un compte ?"),
-                      TextButton(onPressed: () {}, child: Text('Se connecter',style: TextStyle(color: Colors.deepOrange),))
+                      TextButton(onPressed: () => Navigator.pushReplacementNamed(context, '/login'), 
+                      child: Text('Se connecter',style: TextStyle(color: Colors.deepOrange),))
                     ],)
                   ],
                 ),
