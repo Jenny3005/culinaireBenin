@@ -15,6 +15,8 @@ class EthnieController extends Controller
     {
         $ethnies=Ethnie::select('id','nom')->get();
         return response()->json($ethnies,200);
+
+        
     }
 
     /**

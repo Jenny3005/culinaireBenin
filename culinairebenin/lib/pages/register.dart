@@ -21,6 +21,23 @@ class _RegisterPageState extends State<RegisterPage> {
   bool isLoadingRegions = true;
   bool isLoadingEthnies=true;
 
+  final TextEditingController nomController = TextEditingController();
+  final TextEditingController prenomController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController passwordConfirmController = TextEditingController();
+
+  // Libérer les ressources à la fermeture du widget
+  @override
+  void dispose() {
+    nomController.dispose();
+    prenomController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    passwordConfirmController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -30,7 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> fetchEthnies() async {
     final String host = kIsWeb ? 'localhost':'10.0.2.2';
-    final Uri url = Uri.parse('http:$host:8000/api/ethnies');
+    final Uri url = Uri.parse('http://$host:8000/api/ethnies');
 
     try {
       final response = await http.get(url,headers: {'Accept' :'application/json'});
@@ -43,7 +60,7 @@ class _RegisterPageState extends State<RegisterPage> {
             return item is Map ? item['nom'].toString() : item.toString();
           }).toList();
 
-          isLoadingRegions = false;
+          isLoadingEthnies = false;
         });
       }
     } catch (e) {
@@ -80,6 +97,77 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  Future<void> submitForm() async {
+
+    // 2. Afficher un message de chargement
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Inscription en cours...'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    final String host = kIsWeb ? 'localhost' : '10.0.2.2';
+    final Uri url = Uri.parse('http://$host:8000/api/register');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'nom': nomController.text.trim(),
+          'prenom': prenomController.text.trim(),
+          'email': emailController.text.trim(),
+          'password': passwordController.text,
+          'password_confirmation': passwordConfirmController.text,
+          'ethnie': selectedEthnie,
+          'region': selectedRegion,
+          'niveau': selectedLevel,
+        }),
+      );
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // SUCCÈS
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Compte créé avec succès !'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        
+        Navigator.pushReplacementNamed(context, '/login');
+
+      } else {
+        //  ERREUR DU SERVEUR (ex: Code 422 si l'email existe déjà dans Laravel)
+        print("Détails de l'erreur serveur (${response.statusCode}) : ${response.body}");
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur (${response.statusCode}) : ${response.body}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    } catch (e) {
+      // ERREUR RÉSEAU / CONNEXION
+      print("Erreur de connexion : $e");
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Impossible de contacter le serveur. Vérifiez votre connexion API : $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+  }
   final List<String> levels = ['Débutant', 'Intermédiaire', 'Professionnel'];
 
   @override
@@ -291,6 +379,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         );
                       }).toList(),
                     ),
+                    const SizedBox(height: 10),
                     Row(children: [
                       Expanded(child: 
                         ElevatedButton(onPressed:() {},
