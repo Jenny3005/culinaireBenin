@@ -38,7 +38,8 @@ class AuthController extends Controller
 
         $user->profil()->create([
             'level'=>$validated['level'],
-            'region_id'=>$validated['region_id']
+            'region_id'=>$validated['region_id'],
+            'ethnie_id' =>$validated['ethnie_id']
         ]);
         return $user->load('profil');
 
