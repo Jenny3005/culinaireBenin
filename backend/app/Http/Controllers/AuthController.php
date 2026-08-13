@@ -13,7 +13,8 @@ class AuthController extends Controller
             'prenom' =>'required|string|max:255',
             'email' =>'required|string|email|max:255|unique:utilisateurs,email',
             'password'=>'required|min:6|confirmed',
-            'region' =>'required',
+            'region_id' =>'required|exists:regions,id',
+            'ethnie_id' => 'required|exists:ethnies,id',
             'level'=>'required'
         ],[
         'nom.required'      => 'Le nom est obligatoire.',
@@ -37,7 +38,7 @@ class AuthController extends Controller
 
         $user->profil()->create([
             'level'=>$validated['level'],
-            'region'=>$validated['region']
+            'region_id'=>$validated['region_id']
         ]);
         return $user->load('profil');
 

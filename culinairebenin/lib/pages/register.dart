@@ -12,12 +12,12 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  String? selectedRegion;
-  String? selectedEthnie;
+  int? selectedEthnieId;
+  int? selectedRegionId;
   String selectedLevel = 'Débutant';
 
-  List<String> regions = [];
-  List<String> ethnies = [];
+  List<Map<String, dynamic>> regions = [];
+  List<Map<String, dynamic>> ethnies = [];
   bool isLoadingRegions = true;
   bool isLoadingEthnies=true;
 
@@ -56,9 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
         final List<dynamic> data = jsonDecode(response.body);
 
         setState(() {
-          ethnies =data.map((item) {
-            return item is Map ? item['nom'].toString() : item.toString();
-          }).toList();
+          ethnies = List<Map<String, dynamic>>.from(data);
 
           isLoadingEthnies = false;
         });
@@ -82,9 +80,7 @@ class _RegisterPageState extends State<RegisterPage> {
         final List<dynamic> data = jsonDecode(response.body);
 
         setState(() {
-          regions = data.map((item) {
-            return item is Map ? item['nom'].toString() : item.toString();
-          }).toList();
+          regions = List<Map<String, dynamic>>.from(data);
 
           isLoadingRegions = false;
         });
@@ -123,8 +119,8 @@ class _RegisterPageState extends State<RegisterPage> {
           'email': emailController.text.trim(),
           'password': passwordController.text,
           'password_confirmation': passwordConfirmController.text,
-          'ethnie': selectedEthnie,
-          'region': selectedRegion,
+          'ethnie_id': selectedEthnieId,
+          'region_id': selectedRegionId,
           'level': selectedLevel,
         }),
       );
@@ -287,8 +283,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(height: 15),
                     isLoadingEthnies 
                       ? const Center(child: CircularProgressIndicator())
-                      : DropdownButtonFormField<String>(
-                        value: selectedEthnie,
+                      : DropdownButtonFormField<int>(
+                        value: selectedEthnieId,
                         decoration: InputDecoration(
                           labelText: "Votre ethnie",
                           hintText: "Choisissez votre ethnie",
@@ -297,15 +293,15 @@ class _RegisterPageState extends State<RegisterPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        items: ethnies.map((String ethnie) {
-                          return DropdownMenuItem<String>(
-                            value: ethnie,
-                            child: Text(ethnie),
+                        items: ethnies.map((ethnie) {
+                          return DropdownMenuItem<int>(
+                            value: ethnie['id'] as int,
+                            child: Text(ethnie['nom'].toString())
                           );
                         }).toList(),
-                        onChanged: (String? newValue) {
+                        onChanged: (value) {
                           setState(() {
-                            selectedEthnie = newValue;
+                            selectedEthnieId = value;
                           });
                         },
                         validator: (value) => value == null ? "Veuillez choisir une ethnie" : null,
@@ -313,8 +309,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(height: 15),
                     isLoadingRegions
                       ? const Center(child:CircularProgressIndicator())
-                      : DropdownButtonFormField<String>(
-                      value: selectedRegion,
+                      : DropdownButtonFormField<int>(
+                      value: selectedRegionId,
                       decoration: InputDecoration(
                         labelText: "Votre Région",
                         hintText: "Sélectionez votre région",
@@ -323,15 +319,15 @@ class _RegisterPageState extends State<RegisterPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      items: regions.map((String region) {
-                        return DropdownMenuItem<String>(
-                          value: region,
-                          child: Text(region),
+                      items: regions.map((region) {
+                        return DropdownMenuItem<int>(
+                          value: region['id'] as int,
+                          child: Text(region['nom'].toString()),
                         );
                       }).toList(),
-                      onChanged: (String? newValue) {
+                      onChanged: (value) {
                         setState(() {
-                          selectedRegion = newValue;
+                          selectedRegionId = value;
                         });
                       },
                       validator: (value) => value == null ? 'Veuillez choisir une région' : null,
