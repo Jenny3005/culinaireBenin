@@ -12,12 +12,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final TextEditingController serachController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-      final authProvider = Provider.of<AuthProvider>(context);
-      final user = authProvider.utilisateur;
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.utilisateur;
+
+     
+    final String prenom = user?.prenom ?? '';
+    final String initiale = prenom.isNotEmpty ? prenom[0].toUpperCase() : '?';
     return Scaffold(
+      backgroundColor: Colors.amber[50],
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         centerTitle: false,
@@ -25,9 +31,72 @@ class _MyHomePageState extends State<MyHomePage> {
           fontSize: 18,
           fontWeight:FontWeight.bold
         ),),
+        actions: [
+          IconButton(onPressed: (){}, icon: Icon(Icons.grade_outlined)),
+          IconButton(onPressed: () {}, icon: Icon(Icons.notifications_outlined)),
+          CircleAvatar(
+            radius: 15,
+            backgroundColor: Colors.deepOrange,
+            child : Text(
+              initiale,
+            )
+          ),
+          const SizedBox(width: 16),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0), 
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: TextField(
+              controller:SearchController(),
+              decoration: InputDecoration(
+                hintText: "Rechercher une recette, un restaurant...",
+                prefixIcon: Icon(Icons.search),
+                filled: true,
+                fillColor: const Color.fromARGB(85, 238, 238, 238),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                )
+              ),
+            ),
+          )
+        )
       ),
-      body: Center(
-        child: Text ("Trésors Culinaires du Bénin")
+      body: Container(
+        
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // ⚠️ Ajuste la hauteur au contenu
+          crossAxisAlignment: CrossAxisAlignment.center,
+        
+          children: [
+            Row(
+              children: [
+                Icon(Icons.calendar_month),
+                Text("PLAN DE REPAS DU JOUR")
+              ],
+            ),
+            Row(
+              children: [
+                Text("Midi:Amiwo - Soir : Gbègiri",
+                style: TextStyle(fontWeight: FontWeight.bold))
+              ],
+            ),
+            Row(
+              children: [
+                Icon(Icons.local_fire_department),
+                Text("770 kcal estimées - "),
+                Icon(Icons.attach_money),
+                Text("3 125 FCFA")
+              ],
+            )
+          ],
+        ),
       ),
       
 
