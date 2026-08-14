@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
+import '../models/utilisateur.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -41,6 +44,14 @@ class _LoginPageState extends State<LoginPage> {
       
       if (!mounted) return;
       if (response.statusCode==200 || response.statusCode==201) {
+        final data = jsonDecode(response.body);
+
+        // 1. Extraire l'utilisateur du JSON reçu de Laravel
+        // (Ajuste 'user' selon le nom exact de la clé retournée par ton API Laravel)
+        Utilisateur userConnecte = Utilisateur.fromJson(data['user']);
+
+        // 2. Transmettre l'utilisateur à ton AuthProvider !
+        Provider.of<AuthProvider>(context, listen: false).setUtilisateur(userConnecte);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text("Connexion réussie"), 
@@ -73,6 +84,33 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
+  }
+
+  Future<Utilisateur?> connecterUtilisateur(String email, String password) async {
+
+    final String host=kIsWeb ? 'localhost' :'10.0.2.2';
+    final Uri url=Uri.parse('http://$host:8000/api/login');
+    final response = await http.post(
+      url, // adresse de ton backend Laravel
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(
+        {'email': email, 'mot_de_passe': password}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      // 1. Transformation du JSON en objet Utilisateur
+      Utilisateur userConnecte = Utilisateur.fromJson(data['user']);
+      
+      // 2. Récupération du token Sanctum
+      String token = data['token'];
+
+      return userConnecte;
+    } else {
+      print("Erreur de connexion");
+      return null;
+    }
   }
 
   @override

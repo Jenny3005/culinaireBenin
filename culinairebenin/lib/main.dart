@@ -3,8 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:culinairebenin/pages/home_page.dart';
 import 'package:culinairebenin/pages/login.dart';
 import 'package:culinairebenin/pages/register.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
