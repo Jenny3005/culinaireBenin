@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'dart:async';
 
 class LoginPage extends StatefulWidget {
@@ -9,6 +13,68 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController =TextEditingController();
+  final TextEditingController passwordController=TextEditingController();
+
+  Future<void> submitForm() async {
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Connexion en cours ..."),
+        duration :Duration(seconds: 2),  
+      )
+    );
+    
+
+    final String host=kIsWeb ? 'localhost' :'10.0.2.2';
+    final Uri url=Uri.parse('http://$host:8000/api/login');
+
+    try {
+      final response=await http.post(
+        url,
+        headers: {'Accept':'application/json','Content-Type': 'application/json'},
+        body: jsonEncode({
+        'email':emailController.text.trim(),
+        'mot_de_passe':passwordController.text.trim()
+        }),
+      );
+      
+      if (!mounted) return;
+      if (response.statusCode==200 || response.statusCode==201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Connexion réussie"), 
+            backgroundColor: Colors.green,
+          )
+        );
+
+        Navigator.popAndPushNamed(context, '/home');
+      } else {
+        print("Détails de l'erreur serveur (${response.statusCode}) : ${response.body}");
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur (${response.statusCode}) : ${response.body}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Erreur de connexion : $e");
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Impossible de contacter le serveur. Vérifiez votre connexion API : $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +118,9 @@ class _LoginPageState extends State<LoginPage> {
                   Text("Connectez vous pour découvrir les saveurs du Bénin",
                   ),
                   const SizedBox(height: 15,),
-                  TextField(decoration: InputDecoration(
+                  TextField(
+                    controller:emailController,
+                    decoration: InputDecoration(
                     hintText: "votre@email.com",
                     labelText: "Adresse email",
                     prefixIcon: Icon(Icons.email_outlined),
@@ -62,6 +130,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),),
                   const SizedBox(height: 15,),
                   TextField(
+                    controller: passwordController,
+                    obscureText: true,
                     decoration: InputDecoration(
                       labelText: "Mot de passe",
                       hintText: "*****",
@@ -74,7 +144,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 15,),
                   
                   Row(children: [
-                    Expanded(child:ElevatedButton(onPressed: () {},
+                    Expanded(child:ElevatedButton(onPressed: (submitForm),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.brown,
                       foregroundColor: Colors.white,

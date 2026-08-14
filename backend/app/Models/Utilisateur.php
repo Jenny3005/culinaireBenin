@@ -3,9 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
-class Utilisateur extends Model
+class Utilisateur extends Authenticatable
 {
+    use HasApiTokens, Notifiable;
+
     protected $fillable = [
         'nom',
         'prenom',
@@ -15,6 +20,16 @@ class Utilisateur extends Model
         'role',
         'telephone'
     ];
+
+    protected $hidden = [
+        'mot_de_passe',
+        'remember_token',
+    ];
+
+    public function getAuthPassword()
+    {
+        return $this->mot_de_passe;
+    }
 
     public function Reservations() {
         return $this->hasMany(Reservation::class);

@@ -15,3 +15,5 @@ Route::get('/regions',[RegionController::class,'index']);
 Route::post('/register',[AuthController::class,'register']);
 
 Route::get('/ethnies',[EthnieController::class,'index']);
+
+Route::post('/login',[AuthController::class,'login']);

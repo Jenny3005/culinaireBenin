@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\Utilisateur;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -49,4 +50,37 @@ class AuthController extends Controller
             'user'    => $user,
         ], 201);
     }
+
+    public function login(Request $request)
+    {
+        // 1. Validation de la requête
+        $request->validate([
+            'email' => 'required|email',
+            'mot_de_passe' => 'required',
+        ]);
+
+        // 2. Tentative d'authentification avec la colonne mot_de_passe
+        $credentials = [
+            'email' => $request->email,
+            'password' => $request->mot_de_passe,
+        ];
+
+        if (!Auth::attempt($credentials)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Identifiants incorrects'
+            ], 401);
+        }
+
+        // 3. Récupération de l'utilisateur connecté
+        $user = Auth::user();
+
+        // 4. Envoi de la réponse JSON
+        return response()->json([
+            'status' => true,
+            'message' => 'Connexion réussie !',
+            'user' => $user
+        ], 200);
+    }
+
 }
