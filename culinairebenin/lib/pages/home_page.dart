@@ -64,39 +64,75 @@ class _MyHomePageState extends State<MyHomePage> {
         )
       ),
       body: Container(
-        
+        margin: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 20.0),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           
         ),
-        child: Column(
+        child: Padding(
+          padding: const EdgeInsets.all(14.0),
+          
+          child: Column(
           mainAxisSize: MainAxisSize.min, // ⚠️ Ajuste la hauteur au contenu
-          crossAxisAlignment: CrossAxisAlignment.center,
-        
+          crossAxisAlignment: CrossAxisAlignment.start,
+          
           children: [
             Row(
+              
               children: [
-                Icon(Icons.calendar_month),
-                Text("PLAN DE REPAS DU JOUR")
+                Icon(Icons.calendar_month,
+                color: Colors.blue,
+                size: 20,),
+                SizedBox(width: 8,),
+                Text("PLAN DE REPAS DU JOUR",style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 12,
+                ),)
               ],
             ),
+            
             Row(
+             
               children: [
-                Text("Midi:Amiwo - Soir : Gbègiri",
-                style: TextStyle(fontWeight: FontWeight.bold))
+                Text("Midi: Amiwo - Soir : Gbègiri",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15)
+                ),
+                const Spacer(),
+                TextButton(onPressed: () {}, child: Text("Voir + ",textAlign: TextAlign.right,style: TextStyle(
+                  color:Colors.deepOrange,
+                  
+                ),))
               ],
             ),
+            
             Row(
+              
               children: [
-                Icon(Icons.local_fire_department),
-                Text("770 kcal estimées - "),
-                Icon(Icons.attach_money),
-                Text("3 125 FCFA")
+                Icon(Icons.local_fire_department,
+                color: Colors.deepOrange,
+                size:15),
+                SizedBox(width: 2,),
+                Text("770 kcal estimées - ",style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey
+                ),
+                ),
+                Icon(Icons.attach_money,
+                color: const Color(0xFFFFD700),
+                size: 15,),
+                SizedBox(width: 2,),
+                Text("3 125 FCFA",style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey
+                ),)
               ],
             )
           ],
         ),
+      )
       ),
       
 
