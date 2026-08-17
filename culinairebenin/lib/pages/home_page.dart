@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -13,6 +11,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController serachController = TextEditingController();
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = [
+    
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +26,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final String prenom = user?.prenom ?? '';
     final String initiale = prenom.isNotEmpty ? prenom[0].toUpperCase() : '?';
     return Scaffold(
+      
       backgroundColor: Colors.amber[50],
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -63,7 +67,34 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         )
       ),
-      body: Container(
+      body: _pages[_selectedIndex],
+
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home_outlined),selectedIcon: Icon(Icons.home), label: 'Accueil'),
+          NavigationDestination(icon: Icon(Icons.restaurant_menu_outlined),selectedIcon: Icon(Icons.restaurant_menu), label: 'Recettes'),
+          NavigationDestination(icon: Icon(Icons.language_outlined),selectedIcon: Icon(Icons.language), label: 'Explorer'),
+          NavigationDestination(icon: Icon(Icons.table_restaurant_outlined),selectedIcon: Icon(Icons.table_restaurant), label: 'Restaurants'),
+          NavigationDestination(icon: Icon(Icons.sports_esports_outlined),selectedIcon: Icon(Icons.sports_esports), label: 'Jeux')
+        ]
+      ),
+    );
+  }
+}
+
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child:        Container(
         margin: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 20.0),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -135,16 +166,6 @@ class _MyHomePageState extends State<MyHomePage> {
       )
       ),
       
-
-      bottomNavigationBar: NavigationBar(
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined),selectedIcon: Icon(Icons.home), label: 'Accueil'),
-          NavigationDestination(icon: Icon(Icons.restaurant_menu_outlined),selectedIcon: Icon(Icons.restaurant_menu), label: 'Recettes'),
-          NavigationDestination(icon: Icon(Icons.language_outlined),selectedIcon: Icon(Icons.language), label: 'Explorer'),
-          NavigationDestination(icon: Icon(Icons.table_restaurant_outlined),selectedIcon: Icon(Icons.table_restaurant), label: 'Restaurants'),
-          NavigationDestination(icon: Icon(Icons.sports_esports_outlined),selectedIcon: Icon(Icons.sports_esports), label: 'Jeux')
-        ]
-      ),
     );
   }
 }
