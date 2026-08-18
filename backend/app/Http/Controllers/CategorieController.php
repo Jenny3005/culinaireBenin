@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categorie;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CategorieController extends Controller
@@ -10,9 +11,10 @@ class CategorieController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $categories = Categorie::select('id', 'nom')->get();
+        return response()->json($categories, 200);
     }
 
     /**

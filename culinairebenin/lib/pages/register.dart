@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
@@ -19,13 +18,14 @@ class _RegisterPageState extends State<RegisterPage> {
   List<Map<String, dynamic>> regions = [];
   List<Map<String, dynamic>> ethnies = [];
   bool isLoadingRegions = true;
-  bool isLoadingEthnies=true;
+  bool isLoadingEthnies = true;
 
   final TextEditingController nomController = TextEditingController();
   final TextEditingController prenomController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController passwordConfirmController = TextEditingController();
+  final TextEditingController passwordConfirmController =
+      TextEditingController();
 
   // Libérer les ressources à la fermeture du widget
   @override
@@ -46,11 +46,14 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> fetchEthnies() async {
-    final String host = kIsWeb ? 'localhost':'10.0.2.2';
+    final String host = kIsWeb ? 'localhost' : '10.0.2.2';
     final Uri url = Uri.parse('http://$host:8000/api/ethnies');
 
     try {
-      final response = await http.get(url,headers: {'Accept' :'application/json'});
+      final response = await http.get(
+        url,
+        headers: {'Accept': 'application/json'},
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -74,7 +77,10 @@ class _RegisterPageState extends State<RegisterPage> {
     final Uri url = Uri.parse('http://$host:8000/api/regions');
 
     try {
-      final response = await http.get(url, headers: {'Accept': 'application/json'});
+      final response = await http.get(
+        url,
+        headers: {'Accept': 'application/json'},
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -94,7 +100,6 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> submitForm() async {
-
     // 2. Afficher un message de chargement
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -135,12 +140,13 @@ class _RegisterPageState extends State<RegisterPage> {
             backgroundColor: Colors.green,
           ),
         );
-        
-        Navigator.pushReplacementNamed(context, '/login');
 
+        Navigator.pushReplacementNamed(context, '/login');
       } else {
         //  ERREUR DU SERVEUR (ex: Code 422 si l'email existe déjà dans Laravel)
-        print("Détails de l'erreur serveur (${response.statusCode}) : ${response.body}");
+        print(
+          "Détails de l'erreur serveur (${response.statusCode}) : ${response.body}",
+        );
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -157,14 +163,16 @@ class _RegisterPageState extends State<RegisterPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Impossible de contacter le serveur. Vérifiez votre connexion API : $e'),
+          content: Text(
+            'Impossible de contacter le serveur. Vérifiez votre connexion API : $e',
+          ),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 5),
         ),
       );
     }
   }
-  
+
   final List<String> levels = ['Débutant', 'Intermédiaire', 'Professionnel'];
 
   @override
@@ -281,64 +289,73 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    isLoadingEthnies 
-                      ? const Center(child: CircularProgressIndicator())
-                      : DropdownButtonFormField<int>(
-                        value: selectedEthnieId,
-                        decoration: InputDecoration(
-                          labelText: "Votre ethnie",
-                          hintText: "Choisissez votre ethnie",
-                          prefixIcon: const Icon(Icons.language),
-                          border : OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                    isLoadingEthnies
+                        ? const Center(child: CircularProgressIndicator())
+                        : DropdownButtonFormField<int>(
+                            value: selectedEthnieId,
+                            decoration: InputDecoration(
+                              labelText: "Votre ethnie",
+                              hintText: "Choisissez votre ethnie",
+                              prefixIcon: const Icon(Icons.language),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            items: ethnies.map((ethnie) {
+                              return DropdownMenuItem<int>(
+                                value: ethnie['id'] as int,
+                                child: Text(ethnie['nom'].toString()),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedEthnieId = value;
+                              });
+                            },
+                            validator: (value) => value == null
+                                ? "Veuillez choisir une ethnie"
+                                : null,
                           ),
-                        ),
-                        items: ethnies.map((ethnie) {
-                          return DropdownMenuItem<int>(
-                            value: ethnie['id'] as int,
-                            child: Text(ethnie['nom'].toString())
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedEthnieId = value;
-                          });
-                        },
-                        validator: (value) => value == null ? "Veuillez choisir une ethnie" : null,
-                      ),
                     const SizedBox(height: 15),
                     isLoadingRegions
-                      ? const Center(child:CircularProgressIndicator())
-                      : DropdownButtonFormField<int>(
-                      value: selectedRegionId,
-                      decoration: InputDecoration(
-                        labelText: "Votre Région",
-                        hintText: "Sélectionez votre région",
-                        prefixIcon: const Icon(Icons.location_on_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      items: regions.map((region) {
-                        return DropdownMenuItem<int>(
-                          value: region['id'] as int,
-                          child: Text(region['nom'].toString()),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedRegionId = value;
-                        });
-                      },
-                      validator: (value) => value == null ? 'Veuillez choisir une région' : null,
-                    ),
-                    
+                        ? const Center(child: CircularProgressIndicator())
+                        : DropdownButtonFormField<int>(
+                            value: selectedRegionId,
+                            decoration: InputDecoration(
+                              labelText: "Votre Région",
+                              hintText: "Sélectionez votre région",
+                              prefixIcon: const Icon(
+                                Icons.location_on_outlined,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            items: regions.map((region) {
+                              return DropdownMenuItem<int>(
+                                value: region['id'] as int,
+                                child: Text(region['nom'].toString()),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedRegionId = value;
+                              });
+                            },
+                            validator: (value) => value == null
+                                ? 'Veuillez choisir une région'
+                                : null,
+                          ),
+
                     const SizedBox(height: 15),
                     const Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Niveau de cuisine',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -349,7 +366,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         final isSelected = selectedLevel == level;
                         return Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4.0,
+                            ),
                             child: GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -357,12 +376,16 @@ class _RegisterPageState extends State<RegisterPage> {
                                 });
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFAF5EF),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: isSelected ? Colors.deepOrange : Colors.transparent,
+                                    color: isSelected
+                                        ? Colors.deepOrange
+                                        : Colors.transparent,
                                     width: 1.5,
                                   ),
                                 ),
@@ -371,8 +394,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                    color: isSelected ? Colors.deepOrange : Colors.black87,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: isSelected
+                                        ? Colors.deepOrange
+                                        : Colors.black87,
                                   ),
                                 ),
                               ),
@@ -382,27 +409,39 @@ class _RegisterPageState extends State<RegisterPage> {
                       }).toList(),
                     ),
                     const SizedBox(height: 10),
-                    Row(children: [
-                      Expanded(child: 
-                        ElevatedButton(onPressed: submitForm,
-                          style:ElevatedButton.styleFrom(
-                            backgroundColor: Colors.brown,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                    Row(
+                      children: [
+                        Expanded(
+                          
+                          child: ElevatedButton(
+                            onPressed: submitForm,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.brown,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 15),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            child: const Text('Créer mon compte'),
                           ),
-                          child: const Text('Créer mon compte'),
                         ),
-                      ),
-                    ],),
-                    const SizedBox(height:12),
-                    Row(children: [
-                      Text("Déjà un compte ?"),
-                      TextButton(onPressed: () => Navigator.pushReplacementNamed(context, '/login'), 
-                      child: Text('Se connecter',style: TextStyle(color: Colors.deepOrange),))
-                    ],)
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Text("Déjà un compte ?"),
+                        TextButton(
+                          onPressed: () =>
+                              Navigator.pushReplacementNamed(context, '/login'),
+                          child: Text(
+                            'Se connecter',
+                            style: TextStyle(color: Colors.deepOrange),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

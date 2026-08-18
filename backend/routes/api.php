@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\EthnieController;
 use App\Http\Controllers\RegionController;
 use Illuminate\Http\Request;
@@ -17,3 +18,5 @@ Route::post('/register',[AuthController::class,'register']);
 Route::get('/ethnies',[EthnieController::class,'index']);
 
 Route::post('/login',[AuthController::class,'login']);
+
+Route::get('/categories',[CategorieController::class,'index']);

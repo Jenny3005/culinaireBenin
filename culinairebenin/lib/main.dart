@@ -9,9 +9,7 @@ import '../providers/auth_provider.dart';
 void main() {
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
       child: const MyApp(),
     ),
   );
@@ -27,17 +25,18 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Trésors Culinaires du Bénin',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(235, 65, 18, 1)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(235, 65, 18, 1),
+        ),
       ),
       home: const MyLoadingPage(title: 'Loading...'),
 
       initialRoute: '/',
       routes: {
-        '/home': (context) => const MyHomePage(title: 'Trésors Culinaires du Bénin'),
+        '/home': (context) => const MyHomePage(),
         '/register': (context) => const RegisterPage(),
         '/login': (context) => const LoginPage(),
       },
     );
   }
 }
-

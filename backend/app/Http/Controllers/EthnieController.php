@@ -11,12 +11,10 @@ class EthnieController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index():JsonResponse
+    public function index(): JsonResponse
     {
-        $ethnies=Ethnie::select('id','nom')->get();
-        return response()->json($ethnies,200);
-
-        
+        $ethnies = Ethnie::select('id', 'nom')->get();
+        return response()->json($ethnies, 200);
     }
 
     /**
