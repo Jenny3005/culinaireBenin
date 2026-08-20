@@ -19,12 +19,19 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> _pages = [const HomeContent()];
 
   @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.utilisateur;
 
     final String prenom = user?.prenom ?? '';
     final String initiale = prenom.isNotEmpty ? prenom[0].toUpperCase() : '?';
+
     return Scaffold(
       backgroundColor: Colors.amber[50],
       appBar: AppBar(
@@ -32,18 +39,18 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: false,
         title: Text(
           'Bonjour, ${user?.prenom ?? "Invité"}',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.grade_outlined)),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.grade_outlined)),
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.notifications_outlined),
+            icon: const Icon(Icons.notifications_outlined),
           ),
           CircleAvatar(
             radius: 15,
             backgroundColor: Colors.deepOrange,
-            child: Text(initiale),
+            child: Text(initiale, style: const TextStyle(color: Colors.white)),
           ),
           const SizedBox(width: 16),
         ],
@@ -55,10 +62,10 @@ class _MyHomePageState extends State<MyHomePage> {
               vertical: 8.0,
             ),
             child: TextField(
-              controller: SearchController(),
+              controller: searchController,
               decoration: InputDecoration(
                 hintText: "Rechercher une recette, un restaurant...",
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: const Color.fromARGB(85, 238, 238, 238),
                 border: OutlineInputBorder(
@@ -71,7 +78,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: _pages[_selectedIndex],
-
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {
@@ -121,7 +127,10 @@ class HomeContent extends StatefulWidget {
 class _HomeContentState extends State<HomeContent> {
   List<dynamic> categories = [];
   bool isLoading = true;
+  int selectedCategoryIndex = 0;
+
   final ScrollController _categoryScrollController = ScrollController();
+  final ScrollController _restaurantScrollController = ScrollController();
 
   @override
   void initState() {
@@ -129,9 +138,16 @@ class _HomeContentState extends State<HomeContent> {
     fetchCategories();
   }
 
+  @override
+  void dispose() {
+    _categoryScrollController.dispose();
+    _restaurantScrollController.dispose();
+    super.dispose();
+  }
+
   Future<void> fetchCategories() async {
-    // 10.0.2.2 est l'adresse IP correcte pour l'émulateur Android
-    final String host = kIsWeb ? 'localhost' : '10.0.2.2';
+    const String ipMonPC = '192.168.100.13';
+    final String host = kIsWeb ? 'localhost' : ipMonPC;
     final Uri url = Uri.parse('http://$host:8000/api/categories');
 
     try {
@@ -157,12 +173,15 @@ class _HomeContentState extends State<HomeContent> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // PLAN DE REPAS DU JOUR
           Container(
             margin: const EdgeInsets.symmetric(
               horizontal: 20.0,
-              vertical: 20.0,
+              vertical: 15.0,
             ),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -171,13 +190,11 @@ class _HomeContentState extends State<HomeContent> {
             child: Padding(
               padding: const EdgeInsets.all(14.0),
               child: Column(
-                mainAxisSize:
-                    MainAxisSize.min, // ⚠️ Ajuste la hauteur au contenu
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-
                 children: [
                   Row(
-                    children: [
+                    children: const [
                       Icon(Icons.calendar_month, color: Colors.blue, size: 20),
                       SizedBox(width: 8),
                       Text(
@@ -186,10 +203,9 @@ class _HomeContentState extends State<HomeContent> {
                       ),
                     ],
                   ),
-
                   Row(
                     children: [
-                      Text(
+                      const Text(
                         "Midi: Amiwo - Soir : Gbègiri",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -199,17 +215,15 @@ class _HomeContentState extends State<HomeContent> {
                       const Spacer(),
                       TextButton(
                         onPressed: () {},
-                        child: Text(
-                          "Voir + ",
-                          textAlign: TextAlign.right,
+                        child: const Text(
+                          "Voir +",
                           style: TextStyle(color: Colors.deepOrange),
                         ),
                       ),
                     ],
                   ),
-
                   Row(
-                    children: [
+                    children: const [
                       Icon(
                         Icons.local_fire_department,
                         color: Colors.deepOrange,
@@ -222,7 +236,7 @@ class _HomeContentState extends State<HomeContent> {
                       ),
                       Icon(
                         Icons.attach_money,
-                        color: const Color(0xFFFFD700),
+                        color: Color(0xFFFFD700),
                         size: 15,
                       ),
                       SizedBox(width: 2),
@@ -236,6 +250,8 @@ class _HomeContentState extends State<HomeContent> {
               ),
             ),
           ),
+
+          // PLAT DU JOUR
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20.0),
             decoration: BoxDecoration(
@@ -245,20 +261,16 @@ class _HomeContentState extends State<HomeContent> {
             child: Padding(
               padding: const EdgeInsets.all(14.0),
               child: Column(
-                mainAxisSize: MainAxisSize.min, //  Ajuste la hauteur au contenu
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        "PLAT DU JOUR",
-                        style: TextStyle(color: Colors.yellow, fontSize: 12),
-                      ),
-                    ],
+                  const Text(
+                    "PLAT DU JOUR",
+                    style: TextStyle(color: Colors.yellow, fontSize: 12),
                   ),
                   const SizedBox(height: 3),
                   Row(
-                    children: [
+                    children: const [
                       Text(
                         "Amiwo",
                         style: TextStyle(
@@ -266,43 +278,49 @@ class _HomeContentState extends State<HomeContent> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Spacer(),
-                      Text("Image ooh"),
+                      Spacer(),
+                      Text("Image ooh", style: TextStyle(color: Colors.white)),
                     ],
                   ),
                   const SizedBox(height: 3),
-                  Row(
-                    children: [
-                      Text(
-                        "Pâte de maïs rouge- Sud Bénin - Fon",
-                        style: TextStyle(color: Colors.grey, fontSize: 10),
-                      ),
-                    ],
+                  const Text(
+                    "Pâte de maïs rouge - Sud Bénin - Fon",
+                    style: TextStyle(color: Colors.grey, fontSize: 10),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 6),
                   Row(
-                    children: [
+                    children: const [
                       Icon(
                         Icons.local_fire_department,
                         color: Colors.deepOrange,
                         size: 15,
                       ),
                       SizedBox(width: 3),
-                      Text("450 kcal", style: TextStyle(fontSize: 10)),
+                      Text(
+                        "450 kcal",
+                        style: TextStyle(fontSize: 10, color: Colors.white),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(Icons.timer, size: 15, color: Colors.white),
                       SizedBox(width: 3),
-                      Icon(Icons.timer, size: 15),
+                      Text(
+                        "45 min",
+                        style: TextStyle(fontSize: 10, color: Colors.white),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(Icons.group, size: 15, color: Colors.white),
                       SizedBox(width: 3),
-                      Text("45 min", style: TextStyle(fontSize: 10)),
-                      SizedBox(width: 3),
-                      Icon(Icons.group, size: 15),
-                      SizedBox(width: 3),
-                      Text("4 pers.", style: TextStyle(fontSize: 10)),
+                      Text(
+                        "4 pers.",
+                        style: TextStyle(fontSize: 10, color: Colors.white),
+                      ),
                       SizedBox(width: 10),
                       Text(
                         "Facile",
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -311,194 +329,403 @@ class _HomeContentState extends State<HomeContent> {
               ),
             ),
           ),
+
           const SizedBox(height: 15),
-          Column(
-            children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      "Catégories",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : Scrollbar(
-                      controller: _categoryScrollController,
-                      thumbVisibility:
-                          true, // Force la barre à rester toujours visible
-                      trackVisibility:
-                          true, // Affiche la piste de la barre sous le curseur
-                      child: SizedBox(
-                        height:
-                            50, // On augmente légèrement la hauteur pour laisser de la place à la barre
-                        child: ListView.builder(
-                          controller:
-                              _categoryScrollController, // On associe le même controller
-                          scrollDirection: Axis.horizontal,
-                          itemCount: categories.length,
-                          itemBuilder: (context, index) {
-                            final item = categories[index];
-                            return Container(
-                              margin: const EdgeInsets.only(
-                                left: 8,
-                                bottom: 18,
-                              ),
-                              child: Chip(
-                                label: Text(item['nom'] ?? 'Catégorie'),
-                                backgroundColor: Colors.white,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-            ],
+
+          // SECTION CATEGORIES
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "Catégories",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
-          Column(
-            children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                    child: Text(
-                      "Recettes populaires",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
+          const SizedBox(height: 10),
 
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      "Voir tout ",
-                      textAlign: TextAlign.right,
-                      style: TextStyle(color: Colors.deepOrange),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Container(
-                width: 200,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        height: 100,
-                        width: double.infinity,
-                        child: Image.network(
-                          "https://tse4.mm.bing.net/th/id/OIP.KoOzfLXwRAI-Ex-bKd2fYgHaFP?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Text(
-                        "Amiwo",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.location_on, size: 12),
-                          const SizedBox(width: 5,),
-                          Text(
-                            "Sud Bénin",
-                            style: TextStyle(fontSize: 10, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.local_fire_department,color: Colors.deepOrange,size: 12,),
-                          const SizedBox(width: 5,),
-                          Text("450 kcal",style: TextStyle(fontSize: 10,color: Colors.deepOrange),),
-                          const Spacer(),
-                          Text("Facile",style: TextStyle(
-                            color: Colors.green,
-                           
-                            
-                          ),)
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                margin: EdgeInsets.all(10),
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.topRight,
-                    colors: [
-                      Color(0xFF190F14), // Marron / violet très sombre à gauche
-                      Color(0xFF381912), // Marron orangé chaud en haut à droite
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                
-                child: Column(
-                  children: [
-                    
-                    Row(
-                      children: [
-                        Icon(Icons.smart_toy, color: Colors.white),
-                        const SizedBox(width: 15),
-                        Text(
-                          "Assistant IA",
-                          style: TextStyle(color: Colors.amber),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2,),
-                   
-                    Row(
-                      children: [
-                        Text(
-                          '"Je veux un repas béninois riche en protéines..."',
-                          style: TextStyle(
-                            fontStyle: FontStyle.italic,
-                            color: Colors.grey[400],
-                            fontSize: 14,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 50, right: 10 ,bottom: 5,top: 0),
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            child: Text("Essayer"),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepOrange,
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(horizontal: 15),
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Scrollbar(
+                  controller: _categoryScrollController,
+                  thumbVisibility: true,
+                  trackVisibility: true,
+                  child: SizedBox(
+                    height: 60,
+                    child: ListView.builder(
+                      controller: _categoryScrollController,
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        final item = categories[index];
+                        final bool isSelected = selectedCategoryIndex == index;
 
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                        return Container(
+                          margin: const EdgeInsets.only(right: 8, bottom: 12),
+                          child: ChoiceChip(
+                            label: Text(
+                              item['nom'] ?? 'Catégorie',
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.black87,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
                               ),
                             ),
+                            selected: isSelected,
+                            selectedColor: const Color(0xFFFF5722),
+                            backgroundColor: Colors.white,
+                            showCheckmark: false,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(
+                                color: isSelected
+                                    ? Colors.deepOrange
+                                    : Colors.transparent,
+                              ),
+                            ),
+                            onSelected: (bool selected) {
+                              setState(() {
+                                selectedCategoryIndex = index;
+                              });
+                            },
                           ),
-                        ),
-                      
-                      ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
+          // RECETTES POPULAIRES
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Recettes populaires",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    "Voir tout",
+                    style: TextStyle(color: Colors.deepOrange),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              width: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: 100,
+                      width: double.infinity,
+                      child: Image.network(
+                        "https://tse4.mm.bing.net/th/id/OIP.KoOzfLXwRAI-Ex-bKd2fYgHaFP?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Amiwo",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Row(
+                            children: const [
+                              Icon(
+                                Icons.location_on,
+                                size: 12,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(width: 3),
+                              Text(
+                                "Sud Bénin",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: const [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.local_fire_department,
+                                    color: Colors.deepOrange,
+                                    size: 12,
+                                  ),
+                                  SizedBox(width: 3),
+                                  Text(
+                                    "450 kcal",
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.deepOrange,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "Facile",
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
+          ),
+
+          const SizedBox(height: 15),
+
+          // BANNIERE ASSISTANT IA
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.topRight,
+                colors: [Color(0xFF190F14), Color(0xFF381912)],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: const [
+                    Icon(Icons.smart_toy, color: Colors.white),
+                    SizedBox(width: 10),
+                    Text(
+                      "Assistant IA",
+                      style: TextStyle(
+                        color: Colors.amber,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '"Je veux un repas béninois riche en protéines..."',
+                        style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          color: Colors.grey[400],
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepOrange,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text("Essayer"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 15),
+
+          // RESTAURANTS PROCHES
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Restaurants proches",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    "Voir tout",
+                    style: TextStyle(color: Colors.deepOrange),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Scrollbar(
+            controller: _restaurantScrollController,
+            thumbVisibility: true,
+            trackVisibility: true,
+            child: SizedBox(
+              height: 175, // Hauteur indispensable pour le ListView horizontal
+              child: ListView.builder(
+                controller: _restaurantScrollController,
+                scrollDirection: Axis.horizontal,
+                
+                itemCount: 3,
+                itemBuilder: (context, index) {
+                  return Container(
+                    width: 200,
+                    margin: const EdgeInsets.only(right: 10, bottom: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.white,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 90,
+                            width: double.infinity,
+                            child: Image.network(
+                              "https://tse3.mm.bing.net/th/id/OIP.NrwSsZgFWG1mtp8pyUcKawAAAA?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Face à la mer",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const Text(
+                                  'Haie Vive, Cotonou',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: const [
+                                    Text(
+                                      "Ouvert",
+                                      style: TextStyle(
+                                        color: Colors.green,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    Icon(
+                                      Icons.delivery_dining,
+                                      color: Colors.green,
+                                      size: 18,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // BANNIERE CONTRIBUER
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical:5 ,horizontal: 5),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.topRight,
+                colors: [
+                  Color(0xFFD69300),
+                  Color(0xFFC96E00),
+                  Color(0xFFC24C00),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: const [
+                    Icon(Icons.edit, color: Colors.white),
+                    SizedBox(width: 10),
+                    Text(
+                      "Contribuer",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        "Partagez une recette de votre région !",
+                        style: TextStyle(color: Colors.white, fontSize: 13),
+                      ),
+                    ),
+                    
+                    ElevatedButton(
+                      
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.deepOrange,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text("Soumettre"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

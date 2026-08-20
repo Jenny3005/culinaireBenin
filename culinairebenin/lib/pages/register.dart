@@ -46,7 +46,8 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> fetchEthnies() async {
-    final String host = kIsWeb ? 'localhost' : '10.0.2.2';
+    final String ipMonPC = '192.168.100.13';
+    final String host = kIsWeb ? 'localhost' : ipMonPC;
     final Uri url = Uri.parse('http://$host:8000/api/ethnies');
 
     try {
@@ -73,7 +74,8 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> fetchRegions() async {
-    final String host = kIsWeb ? 'localhost' : '10.0.2.2';
+    final String ipMonPC = '192.168.100.13';
+    final String host = kIsWeb ? 'localhost' : ipMonPC;
     final Uri url = Uri.parse('http://$host:8000/api/regions');
 
     try {
@@ -107,8 +109,9 @@ class _RegisterPageState extends State<RegisterPage> {
         duration: Duration(seconds: 2),
       ),
     );
+    final String ipMonPC = '192.168.100.13';
 
-    final String host = kIsWeb ? 'localhost' : '10.0.2.2';
+    final String host = kIsWeb ? 'localhost' : ipMonPC;
     final Uri url = Uri.parse('http://$host:8000/api/register');
 
     try {
@@ -292,6 +295,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     isLoadingEthnies
                         ? const Center(child: CircularProgressIndicator())
                         : DropdownButtonFormField<int>(
+                            isExpanded: true,
                             value: selectedEthnieId,
                             decoration: InputDecoration(
                               labelText: "Votre ethnie",
@@ -320,6 +324,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     isLoadingRegions
                         ? const Center(child: CircularProgressIndicator())
                         : DropdownButtonFormField<int>(
+                            isExpanded: true,
                             value: selectedRegionId,
                             decoration: InputDecoration(
                               labelText: "Votre Région",
@@ -412,7 +417,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     Row(
                       children: [
                         Expanded(
-                          
                           child: ElevatedButton(
                             onPressed: submitForm,
                             style: ElevatedButton.styleFrom(
@@ -430,6 +434,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 12),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("Déjà un compte ?"),
                         TextButton(

@@ -28,8 +28,8 @@ class _LoginPageState extends State<LoginPage> {
       )
     );
     
-
-    final String host=kIsWeb ? 'localhost' :'10.0.2.2';
+    final String ipMonPC = '192.168.100.13';
+    final String host=kIsWeb ? 'localhost' :ipMonPC;
     final Uri url=Uri.parse('http://$host:8000/api/login');
 
     try {
@@ -87,8 +87,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<Utilisateur?> connecterUtilisateur(String email, String password) async {
+    final String ipMonPC = '192.168.100.13';
 
-    final String host=kIsWeb ? 'localhost' :'10.0.2.2';
+    final String host=kIsWeb ? 'localhost' :ipMonPC;
     final Uri url=Uri.parse('http://$host:8000/api/login');
     final response = await http.post(
       url, // adresse de ton backend Laravel
