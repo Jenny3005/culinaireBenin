@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:culinairebenin/pages/recettes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +17,13 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController searchController = TextEditingController();
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [const HomeContent()];
+  final List<Widget> _pages = [
+    const HomeContent(),
+    const RecettePage(),
+    const Center(child: Text("Page Explorer")),
+    const Center(child: Text("Page Restaurants")),
+    const Center(child: Text("Page Jeux")),
+  ];
 
   @override
   void dispose() {
@@ -47,10 +54,29 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {},
             icon: const Icon(Icons.notifications_outlined),
           ),
-          CircleAvatar(
-            radius: 15,
-            backgroundColor: Colors.deepOrange,
-            child: Text(initiale, style: const TextStyle(color: Colors.white)),
+          Material(
+            color: Colors.transparent, // Garde le fond transparent
+            shape:
+                const CircleBorder(), // Conserve la forme circulaire pour l'effet de clic
+            clipBehavior: Clip.hardEdge,
+            child: InkWell(
+              mouseCursor: SystemMouseCursors
+                  .click, // Force le curseur en forme de main sur Web/Desktop
+              onTap: () {
+                Navigator.pushNamed(context, '/profil');
+              },
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: Colors.deepOrange,
+                child: Text(
+                  initiale,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
           ),
           const SizedBox(width: 16),
         ],
@@ -77,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      body: _pages[_selectedIndex],
+      body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {
@@ -597,12 +623,16 @@ class _HomeContentState extends State<HomeContent> {
               child: ListView.builder(
                 controller: _restaurantScrollController,
                 scrollDirection: Axis.horizontal,
-                
+
                 itemCount: 3,
                 itemBuilder: (context, index) {
                   return Container(
                     width: 200,
-                    margin: const EdgeInsets.only(right: 10, bottom: 12),
+                    margin: const EdgeInsets.only(
+                      right: 10,
+                      left: 10,
+                      bottom: 12,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       color: Colors.white,
@@ -672,7 +702,7 @@ class _HomeContentState extends State<HomeContent> {
           Container(
             width: double.infinity,
             margin: const EdgeInsets.symmetric(horizontal: 16),
-            padding: const EdgeInsets.symmetric(vertical:5 ,horizontal: 5),
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 begin: Alignment.centerLeft,
@@ -700,7 +730,7 @@ class _HomeContentState extends State<HomeContent> {
                     ),
                   ],
                 ),
-                
+
                 Row(
                   children: [
                     const Expanded(
@@ -709,9 +739,8 @@ class _HomeContentState extends State<HomeContent> {
                         style: TextStyle(color: Colors.white, fontSize: 13),
                       ),
                     ),
-                    
+
                     ElevatedButton(
-                      
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,

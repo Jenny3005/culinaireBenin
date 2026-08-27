@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:culinairebenin/pages/home_page.dart';
 import 'package:culinairebenin/pages/login.dart';
 import 'package:culinairebenin/pages/register.dart';
+import 'package:culinairebenin/pages/profil.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const MyHomePage(),
         '/register': (context) => const RegisterPage(),
         '/login': (context) => const LoginPage(),
+        '/profil' :(context) => const ProfilPage(),
       },
     );
   }
